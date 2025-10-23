@@ -1,0 +1,82 @@
+import simplegui
+
+time = 0         
+is_running = False 
+total_stops = 0  
+successful_stops = 0 
+
+FRAME_WIDTH = 300
+FRAME_HEIGHT = 200
+TIMER_INTERVAL = 100 
+
+def format(t):
+    """
+    Converts time 't' in tenths of seconds (integer) 
+    to the format A:BC.D (string).
+    """
+    D = t % 10
+    
+    total_seconds = t // 10
+    
+    BC = total_seconds % 60
+    
+    A = total_seconds // 60
+    
+    BC_str = str(BC).zfill(2)
+    
+    formatted_time = str(A) + ":" + BC_str + "." + str(D)
+    
+    return formatted_time
+
+def tick():
+    """Increments the global time variable every 0.1 seconds."""
+    global time
+    time += 1
+
+def start_handler():
+    """Starts the timer and sets the running flag."""
+    global is_running
+    is_running = True
+    timer.start()
+
+def stop_handler():
+    """Stops the timer and updates the score if it was running."""
+    global is_running, total_stops, successful_stops
+    
+    if is_running:
+        timer.stop()
+        total_stops += 1
+        
+        if time % 10 == 0:
+            successful_stops += 1
+            
+        is_running = False
+
+def reset_handler():
+    """Stops the timer and resets time and score counters."""
+    global time, total_stops, successful_stops, is_running
+    
+    timer.stop()
+    time = 0
+    total_stops = 0
+    successful_stops = 0
+    is_running = False
+
+def draw(canvas):
+    """Draws the formatted time and the score to the canvas."""
+    
+    time_str = format(time)
+    canvas.draw_text(time_str, (FRAME_WIDTH / 2 - 50, FRAME_HEIGHT / 2 + 10), 48, 'White')
+    
+    score_str = str(successful_stops) + "/" + str(total_stops)
+    canvas.draw_text(score_str, (FRAME_WIDTH - 60, 30), 24, 'Green')
+
+frame = simplegui.create_frame("Stopwatch - The Game", FRAME_WIDTH, FRAME_HEIGHT)
+timer = simplegui.create_timer(TIMER_INTERVAL, tick) # Interval is 100ms (0.1s)
+
+frame.set_draw_handler(draw)
+frame.add_button("Start", start_handler, 100)
+frame.add_button("Stop", stop_handler, 100)
+frame.add_button("Reset", reset_handler, 100)
+
+frame.start()
