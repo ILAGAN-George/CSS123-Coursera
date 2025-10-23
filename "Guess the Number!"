@@ -1,0 +1,87 @@
+import simplegui
+import random
+import math
+
+secret_number = 0
+range_limit = 100
+guesses_left = 7
+
+def calculate_max_guesses(low, high):
+    """Calculates the minimum number of guesses required."""
+    return int(math.ceil(math.log(high, 2)))
+
+def new_game():
+    """Initializes a new game with the current range_limit."""
+    global secret_number, guesses_left, range_limit
+ 
+    if range_limit == 100:
+        guesses_left = 7
+    elif range_limit == 1000:
+        guesses_left = 10
+    
+    
+    secret_number = random.randrange(0, range_limit)
+    
+    print "" 
+    print "New game started!"
+    print "Range is [0, " + str(range_limit) + ")"
+    print "Number of remaining guesses is " + str(guesses_left)
+
+
+def range100():
+    """Button that changes the range to [0,100) and starts a new game."""
+    global range_limit
+    range_limit = 100
+    new_game()
+
+def range1000():
+    """Button that changes the range to [0,1000) and starts a new game."""
+    global range_limit
+    range_limit = 1000
+    new_game()
+    
+def input_guess(guess):
+    """Main game logic. Processes the user's guess."""
+    global guesses_left, secret_number
+    
+    try:
+        player_guess = int(guess)
+    except ValueError:
+        print "Error: Invalid input. Please enter an integer."
+        return
+
+    print "" 
+    print "Guess was " + str(player_guess)
+    
+    guesses_left -= 1
+
+    if player_guess < secret_number:
+        result = "Higher"
+    elif player_guess > secret_number:
+        result = "Lower"
+    else:
+        result = "Correct!"
+
+    print result
+    
+    if result == "Correct!":
+        print "You win! The secret number was " + str(secret_number) + "."
+        new_game() 
+        return
+    
+    print "Number of remaining guesses is " + str(guesses_left)
+    
+    if guesses_left <= 0:
+        print "You ran out of guesses. The secret number was " + str(secret_number) + "."
+        new_game() 
+
+frame = simplegui.create_frame("Guess the Number", 200, 200)
+
+frame.add_input("Enter your guess", input_guess, 200)
+
+frame.add_button("Range is [0, 100)", range100, 200)
+frame.add_button("Range is [0, 1000)", range1000, 200)
+
+frame.start()
+
+new_game()
